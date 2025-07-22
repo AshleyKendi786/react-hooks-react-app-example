@@ -1,37 +1,28 @@
-import "@testing-library/jest-dom";
-import { render, screen } from "@testing-library/react";
-import { format } from "date-fns";
-import App from "../components/App";
+ // src/__tests__/App.test.js
+import { render, screen } from '@testing-library/react';
+import '@testing-library/jest-dom';
+import App from '../App';
 
-beforeEach(() => {
-  render(<App />);
+// Mock child components with correct paths
+jest.mock('../components/Navigation', () => () => (
+  <div data-testid="mock-navigation">Mock Navigation</div>
+));
+
+jest.mock('../components/ShoppingList', () => () => (
+  <div data-testid="mock-shopping-list">Mock ShoppingList</div>
+));
+
+// Basic router mock
+jest.mock('react-router-dom', () => ({
+  Link: ({ children }) => children,
+  Routes: ({ children }) => children,
+  Route: ({ element }) => element,
+}));
+
+describe('App Component', () => {
+  test('renders without crashing', () => {
+    render(<App />);
+    expect(screen.getByTestId('mock-navigation')).toBeInTheDocument();
+    expect(screen.getByTestId('mock-shopping-list')).toBeInTheDocument();
+  });
 });
-
-test('should include "Now" in the header instead of a time', () => {
-  expect(
-    screen.queryByText(format(new Date(), "MMMM do yyyy, h:mm:ss a"))
-  ).not.toBeInTheDocument();
-  expect(screen.queryByText(/Now/g)).toBeInTheDocument();
-});
-
-test("should include the <ExampleComponent />", () => {
-  expect(screen.queryByText("Whoa!")).toBeInTheDocument();
-});
-
-test("should include the <TestComponent />", () => {
-  expect(screen.queryByTitle("time video")).toBeInTheDocument();
-});
-
-//   it('should include "Now" in the header instead of a time', () => {
-//     expect(wrapper.find('header').text()).to.not.include(moment().format('MMMM Do YYYY'))
-//     expect(wrapper.find('header').text()).to.include('Now')
-//   });
-
-//   it('should include the ExampleComponent', () => {
-//     expect(wrapper.text()).to.include('<ExampleComponent />')
-//   });
-
-//   it('should include the TestComponent', () => {
-//     expect(wrapper.text()).to.include('<TestComponent />')
-//   });
-// });
